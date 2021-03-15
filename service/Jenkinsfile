@@ -1,0 +1,22 @@
+Pipeline {
+    agent { dockerfile true }
+	stages {
+		stage("System configurations") {
+			sh "java -version"
+			sh "mvn -version"
+		}
+		stage('Checkout') {
+			git 'https://github.com/rdbp89/appgate.git'
+		}
+		stage("Build") {
+			sh "mvn clean"
+			sh "mvn install"
+		}
+		stage('Docker Build Image') {
+			sh 'docker build -t test.appgate .'
+		}
+		stage('Run Docker Container') {
+			sh 'docker run -it -d -p 8081:8081 --name test.appgate.container test.appgate'
+		}
+    }
+}
